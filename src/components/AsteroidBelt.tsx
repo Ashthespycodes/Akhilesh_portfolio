@@ -57,6 +57,7 @@ export default function AsteroidBelt({ sectionRef, cardRefs }: Props) {
       })
 
       // Pin planets to card vertical centers
+      if (!cardRefs.current) return
       cardRefs.current.forEach((card, i) => {
         const planet = planetRefs.current[i]
         if (!card || !planet) return

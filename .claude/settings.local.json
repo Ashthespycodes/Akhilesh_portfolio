@@ -18,7 +18,8 @@
       "Bash(npx shadcn@latest add @react-bits/ProfileCard-JS-CSS)",
       "Skill(claude-developer-platform)",
       "mcp__shadcn__search_items_in_registries",
-      "Bash(find 'c:/Users/Akhilesh Bhute/Desktop/port1.0' -maxdepth 1 -name *hug* -o -maxdepth 1 -name *hugging*)"
+      "Bash(find 'c:/Users/Akhilesh Bhute/Desktop/port1.0' -maxdepth 1 -name *hug* -o -maxdepth 1 -name *hugging*)",
+      "Bash(npm run:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
