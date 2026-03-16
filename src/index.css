@@ -1,0 +1,78 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  width: 100%;
+  height: auto;
+  overflow-x: hidden;
+  background: #020408;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+@layer utilities {
+  .font-orbitron {
+    font-family: 'Orbitron', sans-serif;
+  }
+  .font-space-mono {
+    font-family: 'Space Mono', monospace;
+  }
+}
+
+/* LED blink animations */
+@keyframes blink-green {
+  0%, 100% { opacity: 1; box-shadow: 0 0 6px 2px #00ff41; }
+  50% { opacity: 0.2; box-shadow: none; }
+}
+@keyframes blink-amber {
+  0%, 100% { opacity: 1; box-shadow: 0 0 6px 2px #FFB347; }
+  50% { opacity: 0.3; box-shadow: none; }
+}
+@keyframes blink-red {
+  0%, 100% { opacity: 1; box-shadow: 0 0 6px 2px #ff2222; }
+  50% { opacity: 0.1; box-shadow: none; }
+}
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  92% { opacity: 1; }
+  93% { opacity: 0.8; }
+  94% { opacity: 1; }
+  96% { opacity: 0.9; }
+  97% { opacity: 1; }
+}
+@keyframes loadbar {
+  0% { width: 0%; }
+}
+
+.led-green {
+  animation: blink-green 1.2s ease-in-out infinite;
+}
+.led-amber {
+  animation: blink-amber 0.8s ease-in-out infinite;
+}
+.led-red {
+  animation: blink-red 2.1s ease-in-out infinite;
+}
+.cursor-blink {
+  animation: cursor-blink 1s step-end infinite;
+}
+.flicker {
+  animation: flicker 4s infinite;
+}

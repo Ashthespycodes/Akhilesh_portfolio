@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm create vite@latest . -- --template react-ts --yes)",
+      "Bash(npm create vite@latest . -- --template react-ts)",
+      "Bash(npm install)",
+      "Bash(npm run dev -- --open)",
+      "mcp__shadcn__get_add_command_for_items",
+      "mcp__shadcn__view_items_in_registries",
+      "mcp__shadcn__get_item_examples_from_registries",
+      "WebFetch(domain:www.reactbits.dev)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebSearch",
+      "Bash(npx tsc --noEmit)",
+      "Bash(npm run dev)",
+      "WebFetch(domain:react-bits.dev)",
+      "Bash(npx shadcn@latest add @react-bits/LogoLoop-JS-CSS --yes)",
+      "Bash(npx shadcn@latest add @react-bits/ProfileCard-JS-CSS)",
+      "Skill(claude-developer-platform)",
+      "mcp__shadcn__search_items_in_registries",
+      "Bash(find 'c:/Users/Akhilesh Bhute/Desktop/port1.0' -maxdepth 1 -name *hug* -o -maxdepth 1 -name *hugging*)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "shadcn"
+  ]
+}
