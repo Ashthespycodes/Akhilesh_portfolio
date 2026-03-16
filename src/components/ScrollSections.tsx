@@ -274,31 +274,28 @@ export default function ScrollSections({ onSectionChange }: ScrollSectionsProps)
     return () => observer.disconnect()
   }, [onSectionChange])
 
-  // GSAP scroll-triggered experience cards
+  // GSAP scroll-triggered experience cards using context for clean re-render cleanup
   useEffect(() => {
-    const triggers: ScrollTrigger[] = []
-    expCardRefs.current.forEach((card) => {
-      if (!card) return
-      gsap.set(card, { opacity: 0, y: 80 })
-      const tween = gsap.to(card, {
-        opacity: 1,
-        y: 0,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: card,
-          start: 'top 92%',
-          end: 'top 55%',
-          scrub: 1,
-        },
+    const ctx = gsap.context(() => {
+      expCardRefs.current.forEach((card) => {
+        if (!card) return
+        gsap.set(card, { opacity: 0, y: 80 })
+        gsap.to(card, {
+          opacity: 1,
+          y: 0,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: card,
+            start: 'top 92%',
+            end: 'top 55%',
+            scrub: 1,
+          },
+        })
       })
-      if (tween.scrollTrigger) triggers.push(tween.scrollTrigger)
     })
-    return () => triggers.forEach(t => t.kill())
+    return () => ctx.revert()
   }, [])
 
-  const Black = () => (
-    <div style={{ height: '100vh', background: '#020408' }} />
-  )
 
   return (
     <>
@@ -1038,7 +1035,10 @@ export default function ScrollSections({ onSectionChange }: ScrollSectionsProps)
               <div
                 key={i}
                 className="cursor-target"
-                onClick={() => (proj as any).link && window.open((proj as any).link, '_blank', 'noopener,noreferrer')}
+                onClick={() => {
+                  const p = proj as { link?: string };
+                  if (p.link) window.open(p.link, '_blank', 'noopener,noreferrer');
+                }}
                 style={{
                   background: '#050505',
                   border: `1px solid ${proj.accent}33`,

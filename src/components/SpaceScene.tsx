@@ -137,16 +137,21 @@ interface SpaceSceneProps {
   heroProgressRef: MutableRefObject<number>
 }
 
+// Determine if user is likely on a smaller/mobile device to dial back expensive post-processing
+const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
+
 export function SpaceScene({ selectedBody, onBodyClick, heroProgressRef }: SpaceSceneProps) {
   return (
     <Canvas
       camera={{ position: [0, 0, 14], fov: 60, near: 0.1, far: 1000 }}
       style={{ position: 'fixed', inset: 0, zIndex: 1 }}
+      dpr={[1, 1.5]} // Cap DPR at 1.5 to save massive fill-rate on high-res screens
       gl={{
-        antialias: true,
+        antialias: false, // Turn off MSAA, Bloom naturally softens edges and it saves massive overhead
         alpha: true,
         toneMapping: THREE.ACESFilmicToneMapping,
         toneMappingExposure: 1.2,
+        powerPreference: 'high-performance', // Request discrete GPU if available
       }}
     >
       <PhysicsScene

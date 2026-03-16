@@ -260,8 +260,9 @@ void main() {
         try {
           renderer.render({ scene: mesh });
           animationIdRef.current = requestAnimationFrame(loop);
-        } catch (error) {
-          console.warn('WebGL rendering error:', error);
+        } catch {
+          // Silently stop the render loop on WebGL error
+          animationIdRef.current = null;
         }
       };
 
@@ -281,8 +282,8 @@ void main() {
             const loseContextExt = renderer.gl.getExtension('WEBGL_lose_context');
             if (loseContextExt) loseContextExt.loseContext();
             if (canvas && canvas.parentNode) canvas.parentNode.removeChild(canvas);
-          } catch (error) {
-            console.warn('Error during WebGL cleanup:', error);
+          } catch {
+            // Silently handle cleanup error
           }
         }
         rendererRef.current = null;

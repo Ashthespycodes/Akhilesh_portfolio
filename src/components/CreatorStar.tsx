@@ -7,31 +7,32 @@ interface CreatorStarProps {
   onClick?: () => void
 }
 
+// Shaders are module-level constants (never change), so useMemo deps can stay empty
+const coronaVertexShader = `
+  varying vec2 vUv;
+  void main() {
+    vUv = uv;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`
+const coronaFragmentShader = `
+  uniform float time;
+  varying vec2 vUv;
+  void main() {
+    vec2 c = vUv - 0.5;
+    float d = length(c);
+    float inner = 0.3;
+    float outer = 0.5;
+    float alpha = 1.0 - smoothstep(inner, outer, d);
+    alpha *= 0.4 + 0.1 * sin(time * 2.0 + d * 20.0);
+    vec3 col = mix(vec3(1.0, 0.9, 0.3), vec3(1.0, 0.4, 0.0), d * 2.0);
+    gl_FragColor = vec4(col, alpha * (1.0 - d * 1.8));
+  }
+`
+
 export function CreatorStar({ position, onClick }: CreatorStarProps) {
   const meshRef = useRef<THREE.Mesh>(null)
   const coronaRef = useRef<THREE.Mesh>(null)
-
-  const coronaVertexShader = `
-    varying vec2 vUv;
-    void main() {
-      vUv = uv;
-      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-    }
-  `
-  const coronaFragmentShader = `
-    uniform float time;
-    varying vec2 vUv;
-    void main() {
-      vec2 c = vUv - 0.5;
-      float d = length(c);
-      float inner = 0.3;
-      float outer = 0.5;
-      float alpha = 1.0 - smoothstep(inner, outer, d);
-      alpha *= 0.4 + 0.1 * sin(time * 2.0 + d * 20.0);
-      vec3 col = mix(vec3(1.0, 0.9, 0.3), vec3(1.0, 0.4, 0.0), d * 2.0);
-      gl_FragColor = vec4(col, alpha * (1.0 - d * 1.8));
-    }
-  `
 
   const coronaMat = useMemo(() => new THREE.ShaderMaterial({
     vertexShader: coronaVertexShader,

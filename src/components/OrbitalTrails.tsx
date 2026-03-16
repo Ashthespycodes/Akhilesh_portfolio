@@ -1,4 +1,4 @@
-import { useRef, useMemo } from 'react'
+import { useMemo } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import type { PhysicsState } from '../hooks/usePhysics'
@@ -15,8 +15,7 @@ interface TrailMeshProps {
 }
 
 function TrailMesh({ bodyIndex, stateRef }: TrailMeshProps) {
-  // Use primitive refs to avoid JSX line type conflicts
-  const lineRef = useRef<{ geometry: THREE.BufferGeometry } | null>(null)
+  // Use primitive refs to avoid JSX line type conflicts (line primitive manages its own geometry)
 
   const TRAIL_LENGTH = 300
 

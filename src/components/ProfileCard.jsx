@@ -256,7 +256,9 @@ const ProfileCardComponent = ({
               window.addEventListener('deviceorientation', deviceOrientationHandler);
             }
           })
-          .catch(console.error);
+          .catch(() => {
+            // Permission denied or unavailable — silently skip mobile tilt
+          });
       } else {
         window.addEventListener('deviceorientation', deviceOrientationHandler);
       }

@@ -26,22 +26,29 @@ function TypewriterDisplay() {
 
   // Show/hide based on scroll and restart typewriter when returning to hero
   useEffect(() => {
+    let ticking = false
     const onScroll = () => {
-      const scrolled = window.scrollY
-      if (scrolled > HIDE_SCROLL_THRESHOLD) {
-        if (!wasHiddenRef.current) {
-          wasHiddenRef.current = true
-          setVisible(false)
-        }
-      } else {
-        if (wasHiddenRef.current) {
-          wasHiddenRef.current = false
-          // Reset typewriter so it replays from the start
-          setLines([''])
-          setLineIndex(0)
-          setCharIndex(0)
-          setVisible(true)
-        }
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const scrolled = window.scrollY
+          if (scrolled > HIDE_SCROLL_THRESHOLD) {
+            if (!wasHiddenRef.current) {
+              wasHiddenRef.current = true
+              setVisible(false)
+            }
+          } else {
+            if (wasHiddenRef.current) {
+              wasHiddenRef.current = false
+              // Reset typewriter so it replays from the start
+              setLines([''])
+              setLineIndex(0)
+              setCharIndex(0)
+              setVisible(true)
+            }
+          }
+          ticking = false
+        })
+        ticking = true
       }
     }
     window.addEventListener('scroll', onScroll, { passive: true })
@@ -126,12 +133,19 @@ function HeroName() {
   }, [])
 
   useEffect(() => {
+    let ticking = false
     const onScroll = () => {
-      const scrolled = window.scrollY
-      if (scrolled > HIDE_SCROLL_THRESHOLD) {
-        if (!wasHiddenRef.current) { wasHiddenRef.current = true; setVisible(false) }
-      } else {
-        if (wasHiddenRef.current) { wasHiddenRef.current = false; setVisible(true) }
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const scrolled = window.scrollY
+          if (scrolled > HIDE_SCROLL_THRESHOLD) {
+            if (!wasHiddenRef.current) { wasHiddenRef.current = true; setVisible(false) }
+          } else {
+            if (wasHiddenRef.current) { wasHiddenRef.current = false; setVisible(true) }
+          }
+          ticking = false
+        })
+        ticking = true
       }
     }
     window.addEventListener('scroll', onScroll, { passive: true })
@@ -190,7 +204,16 @@ function ScrollHint() {
 
   useEffect(() => {
     const fadeIn = setTimeout(() => setVisible(true), 600)
-    const onScroll = () => { if (window.scrollY > 80) setVisible(false) }
+    let ticking = false
+    const onScroll = () => { 
+      if (!ticking && window.scrollY > 80) {
+        window.requestAnimationFrame(() => {
+          setVisible(false)
+          ticking = false
+        })
+        ticking = true
+      }
+    }
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => { clearTimeout(fadeIn); window.removeEventListener('scroll', onScroll) }
   }, [])
@@ -249,7 +272,16 @@ export function HUDOverlay({ onNavClick, activeNav }: HUDOverlayProps) {
   }, [])
 
   useEffect(() => {
-    const onScroll = () => setPillVisible(window.scrollY > HIDE_SCROLL_THRESHOLD)
+    let ticking = false
+    const onScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setPillVisible(window.scrollY > HIDE_SCROLL_THRESHOLD)
+          ticking = false
+        })
+        ticking = true
+      }
+    }
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])

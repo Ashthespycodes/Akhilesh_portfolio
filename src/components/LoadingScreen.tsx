@@ -19,7 +19,7 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
       setProgress(Math.floor(current))
 
       if (current >= 100) {
-        clearInterval(intervalRef.current!)
+        if (intervalRef.current) clearInterval(intervalRef.current)
         setTimeout(() => {
           setVisible(false)
           setTimeout(onComplete, 800)

@@ -30,7 +30,7 @@ const TargetCursor = ({
   const isMobile = useMemo(() => {
     const hasTouchScreen = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
     const isSmallScreen = window.innerWidth <= 768;
-    const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
+    const userAgent = navigator.userAgent || navigator.vendor || ((window as Window & { opera?: string }).opera ?? '');
     const mobileRegex = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i;
     const isMobileUserAgent = mobileRegex.test(userAgent.toLowerCase());
     return (hasTouchScreen && isSmallScreen) || isMobileUserAgent;
@@ -106,12 +106,13 @@ const TargetCursor = ({
       const cursorY = gsap.getProperty(cursorRef.current, 'y') as number;
 
       const corners = Array.from(cornersRef.current);
+      const positions = targetCornerPositionsRef.current;
       corners.forEach((corner, i) => {
         const currentX = gsap.getProperty(corner, 'x') as number;
         const currentY = gsap.getProperty(corner, 'y') as number;
 
-        const targetX = targetCornerPositionsRef.current![i].x - cursorX;
-        const targetY = targetCornerPositionsRef.current![i].y - cursorY;
+        const targetX = positions[i].x - cursorX;
+        const targetY = positions[i].y - cursorY;
 
         const finalX = currentX + (targetX - currentX) * strength;
         const finalY = currentY + (targetY - currentY) * strength;
@@ -206,7 +207,8 @@ const TargetCursor = ({
       ];
 
       isActiveRef.current = true;
-      gsap.ticker.add(tickerFnRef.current!);
+      const tickerRef = tickerFnRef.current;
+      if (tickerRef) gsap.ticker.add(tickerRef);
 
       gsap.to(activeStrengthRef.current, {
         current: 1,
@@ -214,17 +216,21 @@ const TargetCursor = ({
         ease: 'power2.out'
       });
 
-      corners.forEach((corner, i) => {
-        gsap.to(corner, {
-          x: targetCornerPositionsRef.current![i].x - cursorX,
-          y: targetCornerPositionsRef.current![i].y - cursorY,
-          duration: 0.2,
-          ease: 'power2.out'
+      const cornerPositions = targetCornerPositionsRef.current;
+      if (cornerPositions) {
+        corners.forEach((corner, i) => {
+          gsap.to(corner, {
+            x: cornerPositions[i].x - cursorX,
+            y: cornerPositions[i].y - cursorY,
+            duration: 0.2,
+            ease: 'power2.out'
+          });
         });
-      });
+      }
 
       const leaveHandler = () => {
-        gsap.ticker.remove(tickerFnRef.current!);
+        const ticker = tickerFnRef.current;
+        if (ticker) gsap.ticker.remove(ticker);
 
         isActiveRef.current = false;
         targetCornerPositionsRef.current = null;
@@ -305,6 +311,9 @@ const TargetCursor = ({
 
       isActiveRef.current = false;
       targetCornerPositionsRef.current = null;
+      // activeStrengthRef holds a plain mutable object, NOT a React-rendered DOM node.
+      // Writing to it in cleanup is intentional and safe — the lint rule is a false positive.
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       activeStrengthRef.current.current = 0;
     };
   }, [targetSelector, spinDuration, moveCursor, constants, hideDefaultCursor, isMobile, hoverDuration, parallaxOn]);

@@ -109,7 +109,7 @@ const Particles = ({
   sizeRandomness = 1,
   cameraDistance = 20,
   disableRotation = false,
-  pixelRatio = 1,
+  pixelRatio = typeof window !== 'undefined' ? Math.min(2, window.devicePixelRatio) : 1,
   className = '',
 }: ParticlesProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -190,11 +190,14 @@ const Particles = ({
 
     const particles = new Mesh(gl, { mode: gl.POINTS, geometry, program });
 
-    let animationFrameId: number;
+    let animationFrameId: number | null = null;
     let lastTime = performance.now();
     let elapsed = 0;
+    // We start paused until IntersectionObserver says we're visible
+    let isVisible = false;
 
     const update = (t: number) => {
+      if (!isVisible) return; // Pause loop
       animationFrameId = requestAnimationFrame(update);
       const delta = t - lastTime;
       lastTime = t;
@@ -219,14 +222,34 @@ const Particles = ({
       renderer.render({ scene: particles, camera });
     };
 
-    animationFrameId = requestAnimationFrame(update);
+    // Use IntersectionObserver to pause rendering when off-screen
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        isVisible = entry.isIntersecting;
+        if (isVisible) {
+          lastTime = performance.now(); // Reset time so we don't jump
+          if (animationFrameId === null) {
+            animationFrameId = requestAnimationFrame(update);
+          }
+        } else {
+          if (animationFrameId !== null) {
+            cancelAnimationFrame(animationFrameId);
+            animationFrameId = null;
+          }
+        }
+      });
+    }, { threshold: 0 });
+    observer.observe(container);
 
     return () => {
+      observer.disconnect();
       window.removeEventListener('resize', resize);
       if (moveParticlesOnHover) {
         container.removeEventListener('mousemove', handleMouseMove);
       }
-      cancelAnimationFrame(animationFrameId);
+      if (animationFrameId !== null) {
+        cancelAnimationFrame(animationFrameId);
+      }
       if (container.contains(gl.canvas)) {
         container.removeChild(gl.canvas);
       }

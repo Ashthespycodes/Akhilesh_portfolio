@@ -77,7 +77,6 @@ export function usePhysics() {
         const bj = bodies[j]
         tmp.subVectors(bj.pos, bi.pos)
         const distSq = Math.max(tmp.lengthSq(), 0.5) // softening
-        const dist = Math.sqrt(distSq)
         const force = G * bi.mass * bj.mass / distSq
         tmp.normalize().multiplyScalar(force)
         bi.acc.addScaledVector(tmp, 1 / bi.mass)
@@ -94,11 +93,11 @@ export function usePhysics() {
     // Soft leash: keep HomePlanet (index 2) within MAX_DIST of origin
     const MAX_DIST = 7.0
     const planet = bodies[2]
-    const dist = planet.pos.length()
-    if (dist > MAX_DIST) {
-      const pullStrength = 0.6 * ((dist - MAX_DIST) / dist)
+    const planetDist = planet.pos.length()
+    if (planetDist > MAX_DIST) {
+      const pullStrength = 0.6 * ((planetDist - MAX_DIST) / planetDist)
       planet.acc.addScaledVector(planet.pos, -pullStrength / DT)
-      planet.vel.addScaledVector(planet.pos, -pullStrength / dist)
+      planet.vel.addScaledVector(planet.pos, -pullStrength / planetDist)
     }
 
     // Re-centre: subtract the centre-of-mass position AND velocity every frame

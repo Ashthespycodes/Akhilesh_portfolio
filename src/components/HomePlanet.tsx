@@ -7,27 +7,28 @@ interface HomePlanetProps {
   onClick?: () => void
 }
 
+// Shaders are module-level constants (never change), so useMemo deps can stay empty
+const atmosphereVertexShader = `
+  varying vec3 vNormal;
+  void main() {
+    vNormal = normalize(normalMatrix * normal);
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`
+const atmosphereFragmentShader = `
+  uniform float time;
+  varying vec3 vNormal;
+  void main() {
+    float intensity = pow(0.7 - dot(vNormal, vec3(0,0,1)), 2.0);
+    vec3 atmosphere = vec3(0.0, 0.96, 0.83) * intensity;
+    float pulse = 0.8 + 0.2 * sin(time * 0.8);
+    gl_FragColor = vec4(atmosphere * pulse, intensity * 0.6);
+  }
+`
+
 export function HomePlanet({ position, onClick }: HomePlanetProps) {
   const meshRef = useRef<THREE.Mesh>(null)
   const atmoRef = useRef<THREE.Mesh>(null)
-
-  const atmosphereVertexShader = `
-    varying vec3 vNormal;
-    void main() {
-      vNormal = normalize(normalMatrix * normal);
-      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-    }
-  `
-  const atmosphereFragmentShader = `
-    uniform float time;
-    varying vec3 vNormal;
-    void main() {
-      float intensity = pow(0.7 - dot(vNormal, vec3(0,0,1)), 2.0);
-      vec3 atmosphere = vec3(0.0, 0.96, 0.83) * intensity;
-      float pulse = 0.8 + 0.2 * sin(time * 0.8);
-      gl_FragColor = vec4(atmosphere * pulse, intensity * 0.6);
-    }
-  `
 
   const atmoMat = useMemo(() => new THREE.ShaderMaterial({
     vertexShader: atmosphereVertexShader,

@@ -29,12 +29,6 @@ const LED_COLORS = {
   red: '#ff2222',
 }
 
-const LED_BG = {
-  green: 'rgba(0,255,65,0.15)',
-  amber: 'rgba(255,179,71,0.15)',
-  red: 'rgba(255,34,34,0.15)',
-}
-
 function LEDLight({ color, delay }: LED) {
   return (
     <div style={{

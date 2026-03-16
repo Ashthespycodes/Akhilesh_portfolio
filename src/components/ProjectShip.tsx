@@ -42,8 +42,9 @@ function HullMaterial({ color = '#1a1d23', emissive = '#000000', emissiveIntensi
 
 /* ─── engine glow ─── */
 function EngineGlow({ position, scale = 1 }: { position: [number, number, number]; scale?: number }) {
-  const ref = useRef<THREE.Mesh>(null!)
+  const ref = useRef<THREE.Mesh>(null)
   useFrame(({ clock }) => {
+    if (!ref.current) return
     const s = scale * (0.9 + Math.sin(clock.elapsedTime * 4) * 0.1)
     ref.current.scale.set(s, s, s)
   })
@@ -55,140 +56,7 @@ function EngineGlow({ position, scale = 1 }: { position: [number, number, number
   )
 }
 
-/* ─── top hull group ─── */
-function TopHull({ groupRef }: { groupRef: React.RefObject<THREE.Group> }) {
-  return (
-    <group ref={groupRef}>
-      {/* main upper hull plate */}
-      <mesh position={[0, 0.45, 0]}>
-        <boxGeometry args={[2.6, 0.18, 5.2]} />
-        <HullMaterial color="#5a6070" />
-      </mesh>
-      {/* upper armor ridge */}
-      <mesh position={[0, 0.6, -0.4]}>
-        <boxGeometry args={[1.8, 0.12, 3.6]} />
-        <HullMaterial color="#6a7080" />
-      </mesh>
-      {/* top command bridge */}
-      <mesh position={[0, 0.78, -1.6]}>
-        <boxGeometry args={[1.0, 0.28, 1.0]} />
-        <HullMaterial color="#485060" emissive="#00F5D4" emissiveIntensity={0.3} />
-      </mesh>
-      {/* bridge windows */}
-      <mesh position={[0, 0.8, -2.12]}>
-        <boxGeometry args={[0.7, 0.12, 0.06]} />
-        <meshStandardMaterial color="#00F5D4" emissive="#00F5D4" emissiveIntensity={1.5} transparent opacity={0.6} />
-      </mesh>
-      {/* upper turret left */}
-      <mesh position={[-0.7, 0.65, 0.8]}>
-        <cylinderGeometry args={[0.08, 0.12, 0.3, 8]} />
-        <HullMaterial color="#7a8090" />
-      </mesh>
-      {/* upper turret right */}
-      <mesh position={[0.7, 0.65, 0.8]}>
-        <cylinderGeometry args={[0.08, 0.12, 0.3, 8]} />
-        <HullMaterial color="#7a8090" />
-      </mesh>
-      {/* antenna */}
-      <mesh position={[0, 1.0, -1.6]}>
-        <cylinderGeometry args={[0.015, 0.015, 0.5, 6]} />
-        <HullMaterial color="#8890a0" emissive="#00F5D4" emissiveIntensity={0.8} />
-      </mesh>
-    </group>
-  )
-}
 
-/* ─── bottom hull group ─── */
-function BottomHull({ groupRef }: { groupRef: React.RefObject<THREE.Group> }) {
-  return (
-    <group ref={groupRef}>
-      {/* main lower hull plate */}
-      <mesh position={[0, -0.45, 0]}>
-        <boxGeometry args={[2.6, 0.18, 5.2]} />
-        <HullMaterial color="#505868" />
-      </mesh>
-      {/* lower armor */}
-      <mesh position={[0, -0.6, 0.2]}>
-        <boxGeometry args={[2.0, 0.12, 4.0]} />
-        <HullMaterial color="#5e6575" />
-      </mesh>
-      {/* landing gear struts */}
-      {[-0.8, 0, 0.8].map((x, i) => (
-        <mesh key={i} position={[x, -0.72, 1.0]}>
-          <boxGeometry args={[0.1, 0.12, 0.3]} />
-          <HullMaterial color="#6a6a72" />
-        </mesh>
-      ))}
-      {/* belly plating detail */}
-      <mesh position={[0, -0.55, -1.5]}>
-        <boxGeometry args={[1.4, 0.06, 1.2]} />
-        <HullMaterial color="#606878" />
-      </mesh>
-      {/* lower turrets */}
-      <mesh position={[-0.6, -0.65, -0.3]}>
-        <cylinderGeometry args={[0.1, 0.06, 0.2, 8]} />
-        <HullMaterial color="#7a8090" />
-      </mesh>
-      <mesh position={[0.6, -0.65, -0.3]}>
-        <cylinderGeometry args={[0.1, 0.06, 0.2, 8]} />
-        <HullMaterial color="#7a8090" />
-      </mesh>
-    </group>
-  )
-}
-
-/* ─── left wing ─── */
-function LeftWing({ groupRef }: { groupRef: React.RefObject<THREE.Group> }) {
-  return (
-    <group ref={groupRef}>
-      <mesh position={[-2.2, 0, 0.3]}>
-        <boxGeometry args={[1.8, 0.14, 3.5]} />
-        <HullMaterial color="#4e5565" />
-      </mesh>
-      {/* wing tip */}
-      <mesh position={[-3.2, 0, -0.8]}>
-        <boxGeometry args={[0.3, 0.1, 1.8]} />
-        <HullMaterial color="#586070" />
-      </mesh>
-      {/* wing engine nacelle */}
-      <mesh position={[-2.4, 0, 2.0]}>
-        <cylinderGeometry args={[0.22, 0.28, 0.8, 12]} />
-        <HullMaterial color="#454d5d" />
-      </mesh>
-      <EngineGlow position={[-2.4, 0, 2.42]} scale={0.8} />
-      {/* wing detail lines */}
-      <mesh position={[-1.8, 0.08, 0]}>
-        <boxGeometry args={[0.04, 0.02, 2.8]} />
-        <meshStandardMaterial color="#00F5D4" emissive="#00F5D4" emissiveIntensity={0.8} transparent opacity={0.4} />
-      </mesh>
-    </group>
-  )
-}
-
-/* ─── right wing ─── */
-function RightWing({ groupRef }: { groupRef: React.RefObject<THREE.Group> }) {
-  return (
-    <group ref={groupRef}>
-      <mesh position={[2.2, 0, 0.3]}>
-        <boxGeometry args={[1.8, 0.14, 3.5]} />
-        <HullMaterial color="#4e5565" />
-      </mesh>
-      <mesh position={[3.2, 0, -0.8]}>
-        <boxGeometry args={[0.3, 0.1, 1.8]} />
-        <HullMaterial color="#586070" />
-      </mesh>
-      <mesh position={[2.4, 0, 2.0]}>
-        <cylinderGeometry args={[0.22, 0.28, 0.8, 12]} />
-        <HullMaterial color="#454d5d" />
-      </mesh>
-      <EngineGlow position={[2.4, 0, 2.42]} scale={0.8} />
-      <mesh position={[1.8, 0.08, 0]}>
-        <boxGeometry args={[0.04, 0.02, 2.8]} />
-        <meshStandardMaterial color="#00F5D4" emissive="#00F5D4" emissiveIntensity={0.8} transparent opacity={0.4} />
-      </mesh>
-    </group>
-  )
-}
 
 /* ─── interior skeleton (always centered, revealed when hull opens) ─── */
 function Interior() {
