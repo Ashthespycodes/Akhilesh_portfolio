@@ -157,22 +157,22 @@ function HeroName() {
   }, [])
 
   const isMobile = useIsMobile()
-  if (isMobile) return null
 
   return (
     <div style={{
       position: 'fixed',
-      left: '2.5rem',
-      top: '50%',
-      transform: 'translateY(-50%)',
+      left: isMobile ? '50%' : '2.5rem',
+      top: isMobile ? '50%' : '50%',
+      transform: isMobile ? 'translate(-50%, -50%)' : 'translateY(-50%)',
       zIndex: 200,
       pointerEvents: 'none',
       opacity: visible ? 1 : 0,
       transition: 'opacity 0.8s ease',
+      textAlign: isMobile ? 'center' : 'left',
     }}>
       <p style={{
         fontFamily: 'Orbitron, sans-serif',
-        fontSize: 'clamp(0.45rem, 0.8vw, 0.6rem)',
+        fontSize: isMobile ? '0.6rem' : 'clamp(0.45rem, 0.8vw, 0.6rem)',
         letterSpacing: '0.4em',
         color: '#00F5D4',
         textTransform: 'uppercase',
@@ -182,7 +182,7 @@ function HeroName() {
       </p>
       <h1 style={{
         fontFamily: 'Orbitron, sans-serif',
-        fontSize: 'clamp(1.4rem, 3vw, 2.6rem)',
+        fontSize: isMobile ? '2.2rem' : 'clamp(1.4rem, 3vw, 2.6rem)',
         fontWeight: 900,
         color: '#ffffff',
         lineHeight: 1.05,
@@ -192,10 +192,10 @@ function HeroName() {
         <span style={{ display: 'block' }}>AKHILESH</span>
         <span style={{ display: 'block' }}>BHUTE</span>
       </h1>
-      <div style={{ width: '2rem', height: '2px', background: '#00F5D4', margin: '0.8rem 0' }} />
+      <div style={{ width: '2rem', height: '2px', background: '#00F5D4', margin: isMobile ? '0.8rem auto' : '0.8rem 0' }} />
       <p style={{
         fontFamily: 'Orbitron, sans-serif',
-        fontSize: 'clamp(0.4rem, 0.7vw, 0.55rem)',
+        fontSize: isMobile ? '0.55rem' : 'clamp(0.4rem, 0.7vw, 0.55rem)',
         letterSpacing: '0.25em',
         color: 'rgba(200,230,255,0.6)',
         textTransform: 'uppercase',
