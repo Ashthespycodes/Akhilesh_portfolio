@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useIsMobile } from '../hooks/useIsMobile'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import LogoLoop from './LogoLoop'
@@ -6,7 +7,6 @@ import ProfileCard from './ProfileCard'
 import RocketPath from './RocketPath'
 import ScrollVelocity from './ScrollVelocity'
 import LaserFlow from './LaserFlow'
-import CircularGallery from './CircularGallery'
 import LightRays from './LightRays'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -249,9 +249,9 @@ function BlogSection() {
 }
 
 export default function ScrollSections({ onSectionChange }: ScrollSectionsProps) {
-  const expCardRefs = useRef<(HTMLDivElement | null)[]>([])
   const expSectionRef = useRef<HTMLDivElement>(null)
   const [crModalOpen, setCrModalOpen] = useState(false)
+  const isMobile = useIsMobile()
 
   useEffect(() => {
     const ids = ['about-me', 'experience', 'projects', 'blog', 'information']
@@ -274,27 +274,6 @@ export default function ScrollSections({ onSectionChange }: ScrollSectionsProps)
     return () => observer.disconnect()
   }, [onSectionChange])
 
-  // GSAP scroll-triggered experience cards using context for clean re-render cleanup
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      expCardRefs.current.forEach((card) => {
-        if (!card) return
-        gsap.set(card, { opacity: 0, y: 80 })
-        gsap.to(card, {
-          opacity: 1,
-          y: 0,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: card,
-            start: 'top 92%',
-            end: 'top 55%',
-            scrub: 1,
-          },
-        })
-      })
-    })
-    return () => ctx.revert()
-  }, [])
 
 
   return (
@@ -302,18 +281,18 @@ export default function ScrollSections({ onSectionChange }: ScrollSectionsProps)
       {/* ── ABOUT ME ── */}
       <div
         id="about-me"
-        style={{ position: 'relative', background: '#fff', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}
+        style={{ position: 'relative', background: '#fff', minHeight: isMobile ? 'auto' : '100vh', display: 'flex', flexDirection: 'column' }}
       >
         {topBar}
         <div style={{
           flex: 1,
           display: 'grid',
-          gridTemplateColumns: '1fr 1.6fr',
-          gap: '6vw',
+          gridTemplateColumns: isMobile ? '1fr' : '1fr 1.6fr',
+          gap: isMobile ? '1.5rem' : '6vw',
           alignItems: 'center',
           maxWidth: '1200px',
           margin: '0 auto',
-          padding: '0 8vw',
+          padding: isMobile ? '3vh 6vw 1vh' : '3vh 8vw 2vh',
           width: '100%',
         }}>
           <div>
@@ -335,7 +314,7 @@ export default function ScrollSections({ onSectionChange }: ScrollSectionsProps)
             ))}
           </div>
         </div>
-        <div style={{ flexShrink: 0, borderTop: '1px solid #e8e8e8', padding: '1.5rem 0', overflow: 'hidden', background: '#fff' }}>
+        <div style={{ flexShrink: 0, borderTop: '1px solid #e8e8e8', padding: '1rem 0', overflow: 'hidden', background: '#fff' }}>
           <LogoLoop
             speed={60}
             direction="left"
@@ -479,7 +458,7 @@ export default function ScrollSections({ onSectionChange }: ScrollSectionsProps)
         ))}
 
         {/* ── BLACK (profile card left, achievements right) ── */}
-        <div style={{ minHeight: '115vh', display: 'grid', gridTemplateColumns: '1fr 1fr', alignItems: 'center', padding: '5vh 6vw', gap: '4vw', position: 'relative' }}>
+        <div style={{ minHeight: isMobile ? 'auto' : '115vh', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', alignItems: 'center', padding: isMobile ? '4vh 6vw' : '5vh 6vw', gap: isMobile ? '2rem' : '4vw', position: 'relative' }}>
         <RocketPath />
 
         {/* Left — Profile Card + Download Resume */}
@@ -546,7 +525,7 @@ export default function ScrollSections({ onSectionChange }: ScrollSectionsProps)
           </div>
 
           {/* Education */}
-          <div style={{ background: '#0d1117', border: '1px solid #1e2030', borderRadius: '14px', padding: '1.1rem 1.4rem' }}>
+          <div style={{ background: 'rgba(255,255,255,0.04)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '14px', padding: '1.1rem 1.4rem' }}>
             <p style={{ fontFamily: 'Orbitron, sans-serif', fontSize: '0.45rem', letterSpacing: '0.3em', color: '#facc15', textTransform: 'uppercase' as const, marginBottom: '0.6rem' }}>
               Education
             </p>
@@ -555,7 +534,7 @@ export default function ScrollSections({ onSectionChange }: ScrollSectionsProps)
                 { school: 'Universal High School', board: 'ICSE · Class 10', score: '93.8%' },
                 { school: 'Vidya Vijay', board: 'CBSE · Class 12', score: '86.8%' },
               ].map((e, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#111827', borderRadius: '8px', padding: '0.5rem 0.8rem' }}>
+                <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', padding: '0.5rem 0.8rem' }}>
                   <div>
                     <p style={{ fontFamily: 'Inter, system-ui, sans-serif', fontSize: 'clamp(0.65rem, 1.1vw, 0.8rem)', fontWeight: 600, color: '#fff', margin: 0 }}>{e.school}</p>
                     <p style={{ fontFamily: 'Inter, system-ui, sans-serif', fontSize: 'clamp(0.55rem, 0.9vw, 0.68rem)', color: '#666', margin: '0.15rem 0 0' }}>{e.board}</p>
@@ -567,7 +546,7 @@ export default function ScrollSections({ onSectionChange }: ScrollSectionsProps)
           </div>
 
           {/* LeetCode Stats */}
-          <div style={{ background: '#0d1117', border: '1px solid #1e2030', borderRadius: '14px', padding: '1.1rem 1.4rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
+          <div style={{ background: 'rgba(255,255,255,0.04)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '14px', padding: '1.1rem 1.4rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
             <div>
               <p style={{ fontFamily: 'Orbitron, sans-serif', fontSize: '0.45rem', letterSpacing: '0.3em', color: '#f97316', textTransform: 'uppercase' as const, marginBottom: '0.25rem' }}>
                 Competitive Programming
@@ -585,7 +564,7 @@ export default function ScrollSections({ onSectionChange }: ScrollSectionsProps)
               </a>
             </div>
             {/* LeetCode stats widget */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: '#111827', borderRadius: '10px', padding: '10px 12px', flexShrink: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px', padding: '10px 12px', flexShrink: 0 }}>
               <svg width="68" height="68" viewBox="0 0 70 70" style={{ flexShrink: 0 }}>
                 <defs>
                   <linearGradient id="lc-arc-grad" x1="0%" y1="100%" x2="100%" y2="0%">
@@ -613,7 +592,7 @@ export default function ScrollSections({ onSectionChange }: ScrollSectionsProps)
                   { label: 'Med.', solved: 72, total: 2021, color: '#ffc01e' },
                   { label: 'Hard', solved: 5, total: 913, color: '#ef4743' },
                 ].map(s => (
-                  <div key={s.label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', background: '#0d1117', borderRadius: '5px', padding: '3px 7px', minWidth: '90px' }}>
+                  <div key={s.label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', background: 'rgba(255,255,255,0.06)', borderRadius: '5px', padding: '3px 7px', minWidth: '90px' }}>
                     <span style={{ fontFamily: 'Orbitron, sans-serif', fontSize: '0.42rem', color: s.color }}>{s.label}</span>
                     <span style={{ fontFamily: 'Orbitron, sans-serif', fontSize: '0.42rem', color: '#fff' }}>
                       {s.solved}<span style={{ color: '#444' }}>/{s.total}</span>
@@ -625,7 +604,7 @@ export default function ScrollSections({ onSectionChange }: ScrollSectionsProps)
           </div>
 
           {/* Dean's List */}
-          <div style={{ background: '#0d1117', border: '1px solid #1e2030', borderRadius: '14px', padding: '1.1rem 1.4rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
+          <div style={{ background: 'rgba(255,255,255,0.04)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '14px', padding: '1.1rem 1.4rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
             <div>
               <p style={{ fontFamily: 'Orbitron, sans-serif', fontSize: '0.45rem', letterSpacing: '0.3em', color: '#a78bfa', textTransform: 'uppercase' as const, marginBottom: '0.25rem' }}>
                 Academic Excellence
@@ -646,8 +625,8 @@ export default function ScrollSections({ onSectionChange }: ScrollSectionsProps)
           </div>
 
           {/* CGPA + Deloitte */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-            <div style={{ background: '#0d1117', border: '1px solid #1e2030', borderRadius: '14px', padding: '1.1rem 1.4rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '1rem' }}>
+            <div style={{ background: 'rgba(255,255,255,0.04)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '14px', padding: '1.1rem 1.4rem' }}>
               <p style={{ fontFamily: 'Orbitron, sans-serif', fontSize: '0.45rem', letterSpacing: '0.3em', color: '#34d399', textTransform: 'uppercase' as const, marginBottom: '0.25rem' }}>
                 Academic GPA
               </p>
@@ -659,7 +638,7 @@ export default function ScrollSections({ onSectionChange }: ScrollSectionsProps)
               </p>
             </div>
 
-            <div style={{ background: '#0d1117', border: '1px solid #1e2030', borderRadius: '14px', padding: '1.1rem 1.4rem' }}>
+            <div style={{ background: 'rgba(255,255,255,0.04)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '14px', padding: '1.1rem 1.4rem' }}>
               <p style={{ fontFamily: 'Orbitron, sans-serif', fontSize: '0.45rem', letterSpacing: '0.3em', color: '#86E1F4', textTransform: 'uppercase' as const, marginBottom: '0.25rem' }}>
                 Competition
               </p>
@@ -673,6 +652,71 @@ export default function ScrollSections({ onSectionChange }: ScrollSectionsProps)
           </div>
         </div>
         </div>{/* end profile grid */}
+
+        {/* ── TECH STACK & SKILLS ── */}
+        <div style={{ padding: '4rem 8vw 5rem', position: 'relative' }}>
+        <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+          <p style={{ fontFamily: 'Orbitron, sans-serif', fontSize: 'clamp(0.55rem, 1vw, 0.7rem)', letterSpacing: '0.35em', color: '#555', textTransform: 'uppercase' as const, marginBottom: '0.6rem' }}>
+            Arsenal
+          </p>
+          <h2 style={{ fontFamily: 'Orbitron, sans-serif', fontSize: 'clamp(1.4rem, 3vw, 2.4rem)', fontWeight: 900, color: '#fff', letterSpacing: '-0.02em', lineHeight: 1, margin: '0 0 1rem' }}>
+            TECH STACK &amp; SKILLS
+          </h2>
+          <div style={{ width: '40px', height: '2px', background: '#00F5D4', marginBottom: '2.5rem' }} />
+
+          {[
+            {
+              label: 'Languages',
+              color: '#00F5D4',
+              skills: ['Python', 'C++', 'Java', 'TypeScript'],
+            },
+            {
+              label: 'Frameworks & Libraries',
+              color: '#C4B5FD',
+              skills: ['FastAPI', 'React', 'Flask', 'Streamlit', 'PyTorch', 'LangChain', 'HuggingFace', 'scikit-learn', 'pandas', 'numpy', 'matplotlib'],
+            },
+            {
+              label: 'AI & ML Concepts',
+              color: '#86E1F4',
+              skills: ['CNN', 'RAG Pipelines', 'Transformer Architecture', 'LSTM', 'Gemini LLM'],
+            },
+            {
+              label: 'Infrastructure & Tools',
+              color: '#f97316',
+              skills: ['AWS', 'Docker', 'CI/CD Pipelines', 'Git', 'GitHub', 'Jupyter Notebook'],
+            },
+            {
+              label: 'Simulation & Visualisation',
+              color: '#34d399',
+              skills: ['Mesa', 'Phaser.js'],
+            },
+          ].map((group, gi) => (
+            <div key={gi} style={{ marginBottom: '2rem' }}>
+              <p style={{ fontFamily: 'Orbitron, sans-serif', fontSize: 'clamp(0.45rem, 0.8vw, 0.6rem)', letterSpacing: '0.3em', color: group.color, textTransform: 'uppercase' as const, marginBottom: '0.8rem' }}>
+                {group.label}
+              </p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem' }}>
+                {group.skills.map(skill => (
+                  <span key={skill} style={{
+                    fontFamily: 'Orbitron, sans-serif',
+                    fontSize: 'clamp(0.48rem, 0.85vw, 0.65rem)',
+                    letterSpacing: '0.1em',
+                    color: '#fff',
+                    background: 'rgba(255,255,255,0.05)',
+                    backdropFilter: 'blur(12px)',
+                    WebkitBackdropFilter: 'blur(12px)',
+                    border: `1px solid ${group.color}33`,
+                    borderRadius: '6px',
+                    padding: '0.45rem 0.9rem',
+                  }}>
+                    {skill}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+        </div>
 
         {/* ── HOBBIES & LIFESTYLE ── */}
         <div style={{ padding: '5rem 8vw 6rem', position: 'relative' }}>
@@ -694,7 +738,7 @@ export default function ScrollSections({ onSectionChange }: ScrollSectionsProps)
               { icon: '⚔', label: 'Clash Royale', desc: 'Highest Rank — Ultimate Champion · 1800 ELO · Local Peak Rank — 305 (IND)', link: '__cr_modal__' },
               { icon: '🎯', label: 'Valorant', desc: 'Peak Rank — Immortal 2 · 180 ELO', link: 'https://tracker.gg/valorant/profile/riot/Myster1oQT%231613/overview?platform=pc&playlist=competitive&season=aef237a0-494d-3a14-a1c8-ec8de84e309c' },
             ] as { icon: string; label: string; desc: string; link?: string }[]).map((h, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '1.4rem', background: '#0d1117', border: '1px solid #1e2030', borderRadius: '12px', padding: '1.1rem 1.6rem' }}>
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '1.4rem', background: 'rgba(255,255,255,0.04)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '12px', padding: '1.1rem 1.6rem' }}>
                 <span style={{ fontSize: '1.6rem', flexShrink: 0 }}>{h.icon}</span>
                 <div style={{ flex: 1 }}>
                   <p style={{ fontFamily: 'Orbitron, sans-serif', fontSize: 'clamp(0.7rem, 1.1vw, 0.85rem)', fontWeight: 700, color: '#00F5D4', margin: '0 0 0.25rem', letterSpacing: '0.1em' }}>{h.label}</p>
@@ -741,69 +785,6 @@ export default function ScrollSections({ onSectionChange }: ScrollSectionsProps)
         </div>
       )}
 
-      {/* ── TECHSTACK (circular gallery) ── */}
-      <div style={{ width: '100%', height: '600px', background: '#020408', position: 'relative', overflow: 'hidden' }}>
-
-        {/* Shooting comets */}
-        {[
-          { top: '8%',  left: '-8%',  delay: '0.3s',  dur: '2.8s', rot: 38 },
-          { top: '20%', left: '15%',  delay: '1.5s',  dur: '3.1s', rot: 35 },
-          { top: '5%',  left: '45%',  delay: '0.8s',  dur: '2.6s', rot: 40 },
-          { top: '40%', left: '-5%',  delay: '2.4s',  dur: '3.4s', rot: 36 },
-          { top: '55%', left: '30%',  delay: '1.0s',  dur: '3.0s', rot: 37 },
-          { top: '70%', left: '60%',  delay: '2.0s',  dur: '2.9s', rot: 39 },
-        ].map((s, i) => (
-          <div key={i} className="star-track" style={{ top: s.top, left: s.left, transform: `rotate(${s.rot}deg)`, transformOrigin: 'left center', position: 'absolute', zIndex: 0 }}>
-            <div className="star-trail" style={{ animationDelay: s.delay, animationDuration: s.dur }} />
-          </div>
-        ))}
-
-        {/* Background star dots */}
-        {[
-          { top: '7%',  left: '10%',  size: 2, dur: '3.2s', delay: '0s'   },
-          { top: '20%', left: '28%',  size: 1, dur: '4.0s', delay: '1.2s' },
-          { top: '38%', left: '8%',   size: 2, dur: '2.8s', delay: '0.6s' },
-          { top: '55%', left: '20%',  size: 1, dur: '3.6s', delay: '2.1s' },
-          { top: '15%', left: '52%',  size: 2, dur: '4.3s', delay: '0.9s' },
-          { top: '45%', left: '65%',  size: 1, dur: '3.0s', delay: '1.7s' },
-          { top: '72%', left: '42%',  size: 2, dur: '2.5s', delay: '0.4s' },
-          { top: '30%', left: '78%',  size: 1, dur: '3.8s', delay: '2.6s' },
-          { top: '60%', left: '88%',  size: 2, dur: '3.5s', delay: '1.3s' },
-          { top: '12%', left: '85%',  size: 1, dur: '4.1s', delay: '0.7s' },
-          { top: '80%', left: '15%',  size: 2, dur: '3.3s', delay: '1.9s' },
-          { top: '88%', left: '70%',  size: 1, dur: '2.7s', delay: '3.0s' },
-          { top: '25%', left: '38%',  size: 2, dur: '4.5s', delay: '0.2s' },
-          { top: '50%', left: '55%',  size: 1, dur: '3.1s', delay: '2.4s' },
-          { top: '65%', left: '3%',   size: 2, dur: '3.9s', delay: '1.1s' },
-        ].map((s, i) => (
-          <div key={i} className="star-dot" style={{ top: s.top, left: s.left, width: s.size, height: s.size, animationDuration: s.dur, animationDelay: s.delay, zIndex: 0 }} />
-        ))}
-
-        <div style={{ position: 'absolute', top: '2rem', left: 0, right: 0, textAlign: 'center', zIndex: 10, pointerEvents: 'none' }}>
-          <p style={{ fontFamily: 'Orbitron, sans-serif', fontSize: 'clamp(0.55rem, 1vw, 0.7rem)', letterSpacing: '0.35em', color: '#00F5D4', textTransform: 'uppercase', margin: 0 }}>
-            My Techstack
-          </p>
-        </div>
-        <div style={{ position: 'absolute', inset: 0, zIndex: 2 }}>
-          <CircularGallery
-            bend={3}
-            textColor="#ffffff"
-            borderRadius={0.05}
-            items={[
-              { image: '/cpp.png', text: 'C++' },
-              { image: '/python.png', text: 'Python' },
-              { image: '/github.png', text: 'GitHub' },
-              { image: '/claude.png', text: 'Claude Code' },
-              { image: '/tensorflow.png', text: 'TensorFlow' },
-              { image: '/fastapi.png', text: 'FastAPI' },
-              { image: '/react.png', text: 'React' },
-              { image: '/pytorch.png', text: 'PyTorch' },
-              { image: '/docker.png', text: 'Docker' },
-              { image: '/huggingface.png', text: 'Hugging Face' },
-            ]}
-          />
-        </div>
-      </div>
 
       {/* ── EXPERIENCE ── */}
       <div
@@ -874,7 +855,7 @@ export default function ScrollSections({ onSectionChange }: ScrollSectionsProps)
         </div>
 
         {/* Centered content */}
-        <div style={{ maxWidth: '900px', margin: '0 auto', padding: '6rem 4vw 10rem', position: 'relative', zIndex: 1 }}>
+        <div style={{ maxWidth: '900px', margin: '0 auto', padding: isMobile ? '3rem 5vw 5rem' : '6rem 4vw 10rem', position: 'relative', zIndex: 1 }}>
         {/* Heading */}
         <div style={{ padding: '0 0 4rem', maxWidth: '900px' }}>
           <p style={{ fontFamily: 'Orbitron, sans-serif', fontSize: 'clamp(0.55rem, 1vw, 0.7rem)', letterSpacing: '0.35em', color: '#aaa', textTransform: 'uppercase', marginBottom: '0.8rem' }}>
@@ -891,12 +872,12 @@ export default function ScrollSections({ onSectionChange }: ScrollSectionsProps)
           {EXPERIENCE_CARDS.map((card, ci) => (
             <div
               key={ci}
-              ref={el => { expCardRefs.current[ci] = el }}
+
               style={{
                 background: '#050505',
                 borderLeft: `4px solid ${card.accent}`,
                 borderRadius: '6px',
-                padding: '3.2rem 4rem',
+                padding: isMobile ? '1.5rem 1.2rem' : '3.2rem 4rem',
                 boxShadow: '0 4px 24px rgba(0,0,0,0.15)',
               }}
             >
@@ -984,7 +965,7 @@ export default function ScrollSections({ onSectionChange }: ScrollSectionsProps)
           flexDirection: 'column',
           maxWidth: '1200px',
           margin: '0 auto',
-          padding: '8vh 8vw',
+          padding: isMobile ? '4vh 6vw' : '8vh 8vw',
           width: '100%',
         }}>
           {/* heading */}
@@ -1120,7 +1101,7 @@ export default function ScrollSections({ onSectionChange }: ScrollSectionsProps)
         }} />
         <LaserFlow wispDensity={1.2} flowSpeed={0.6} verticalBeamOffset={-0.45} />
         {/* Random fact — left side */}
-        <div style={{ position: 'absolute', left: '15vw', top: '50%', transform: 'translateY(-50%)', maxWidth: '280px', zIndex: 10, pointerEvents: 'none' }}>
+        <div style={{ position: isMobile ? 'relative' : 'absolute', left: isMobile ? 'auto' : '15vw', top: isMobile ? 'auto' : '50%', transform: isMobile ? 'none' : 'translateY(-50%)', maxWidth: '280px', zIndex: 10, pointerEvents: 'none', margin: isMobile ? '0 auto' : undefined, padding: isMobile ? '2rem 6vw' : undefined }}>
           <p style={{ fontFamily: 'Orbitron, sans-serif', fontSize: 'clamp(0.65rem, 1.1vw, 0.85rem)', letterSpacing: '0.35em', color: '#00F5D4', textTransform: 'uppercase', marginBottom: '0.8rem', opacity: 0.7 }}>
             Random Fact
           </p>
@@ -1137,7 +1118,7 @@ export default function ScrollSections({ onSectionChange }: ScrollSectionsProps)
       >
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '2px', background: '#00F5D4' }} />
 
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: '0 8vw', maxWidth: '1200px', margin: '0 auto', width: '100%', textAlign: 'center' as const }}>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: isMobile ? '4vh 6vw' : '0 8vw', maxWidth: '1200px', margin: '0 auto', width: '100%', textAlign: 'center' as const }}>
           <div style={{ marginBottom: '4rem' }}>
             <h2 style={{ fontFamily: 'Orbitron, sans-serif', fontSize: 'clamp(2.8rem, 7vw, 6.5rem)', fontWeight: 900, color: '#fff', lineHeight: 0.95, letterSpacing: '-0.02em', marginBottom: '1.5rem' }}>
               <span style={{ display: 'block' }}>INFORMATION</span>

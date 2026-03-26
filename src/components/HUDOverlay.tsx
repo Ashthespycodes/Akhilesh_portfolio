@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { gsap } from 'gsap'
+import { useIsMobile } from '../hooks/useIsMobile'
 
 const NAV_ITEMS = ['About Me', 'Experience', 'Projects', 'Blog', 'Information']
 
@@ -85,6 +86,9 @@ function TypewriterDisplay() {
     })
   }, [charIndex, lineIndex])
 
+  const isMobile = useIsMobile()
+  if (isMobile) return null
+
   return (
     <div style={{
       position: 'fixed',
@@ -151,6 +155,9 @@ function HeroName() {
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
+
+  const isMobile = useIsMobile()
+  if (isMobile) return null
 
   return (
     <div style={{
@@ -260,6 +267,7 @@ function ScrollHint() {
 export function HUDOverlay({ onNavClick, activeNav }: HUDOverlayProps) {
   const navRef = useRef<HTMLDivElement>(null)
   const [pillVisible, setPillVisible] = useState(false)
+  const isMobile = useIsMobile()
 
   useEffect(() => {
     if (navRef.current) {
@@ -293,16 +301,18 @@ export function HUDOverlay({ onNavClick, activeNav }: HUDOverlayProps) {
         ref={navRef}
         style={{
           position: 'fixed',
-          top: '1.2rem',
+          top: '0.6rem',
           left: '50%',
           transform: 'translateX(-50%)',
           display: 'flex',
           justifyContent: 'center',
-          gap: 'clamp(1.5rem, 4vw, 4rem)',
+          flexWrap: 'wrap',
+          gap: isMobile ? '0.5rem' : 'clamp(1.5rem, 4vw, 4rem)',
           zIndex: 200,
           pointerEvents: 'auto',
           borderRadius: '100px',
-          padding: '0.6rem 2.5rem',
+          padding: isMobile ? '0.4rem 1rem' : '0.6rem 2.5rem',
+          width: isMobile ? '100%' : 'auto',
         }}
       >
         {/* Pill background — fades in once hero is scrolled past */}
@@ -329,8 +339,8 @@ export function HUDOverlay({ onNavClick, activeNav }: HUDOverlayProps) {
               border: 'none',
               color: activeNav === item ? '#00F5D4' : 'rgba(200,230,255,0.85)',
               fontFamily: 'Orbitron, sans-serif',
-              fontSize: 'clamp(0.55rem, 1.1vw, 0.75rem)',
-              letterSpacing: '0.3em',
+              fontSize: isMobile ? '0.5rem' : 'clamp(0.55rem, 1.1vw, 0.75rem)',
+              letterSpacing: isMobile ? '0.1em' : '0.3em',
               textTransform: 'uppercase',
               cursor: 'pointer',
               padding: '0.5rem 0',

@@ -27,6 +27,7 @@ export default function App() {
   const [selectedBody, setSelectedBody] = useState<number | null>(null)
   const [activeNav, setActiveNav] = useState<string | null>(null)
   const [showContent, setShowContent] = useState(false)
+  const [scenePaused, setScenePaused] = useState(false)
 
   // Single 0→1 value that drives both zoom and scatter inside SpaceScene
   const heroProgressRef = useRef(0)
@@ -35,6 +36,23 @@ export default function App() {
     setLoaded(true)
     // Delay showing content to allow initial animations/setup to complete
     setTimeout(() => setShowContent(true), 100)
+
+    // Aggressively pre-fetch lazy chunks in the background while user is reading the landing page
+    if (typeof window !== 'undefined') {
+      const prefetch = () => {
+        setTimeout(() => {
+          import('./components/ProjectShip').catch(() => {})
+          import('./components/ScrollSections').catch(() => {})
+          import('./components/Particles').catch(() => {})
+        }, 1500)
+      }
+      if ('requestIdleCallback' in window) {
+        // @ts-ignore
+        window.requestIdleCallback(prefetch, { timeout: 2000 })
+      } else {
+        prefetch()
+      }
+    }
   }, [])
 
   useEffect(() => {
@@ -55,6 +73,26 @@ export default function App() {
 
     return () => ctx.revert()
   }, [loaded, showContent])
+
+  // Pause the 3D render loop once user scrolls past the About Me section
+  useEffect(() => {
+    if (!loaded) return
+    let ticking = false
+    const onScroll = () => {
+      if (ticking) return
+      ticking = true
+      window.requestAnimationFrame(() => {
+        const aboutMe = document.getElementById('about-me')
+        if (aboutMe) {
+          const bottom = aboutMe.getBoundingClientRect().bottom
+          setScenePaused(bottom < 0)
+        }
+        ticking = false
+      })
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [loaded])
 
   const handleBodyClick = useCallback((index: number) => {
     setSelectedBody(prev => prev === index ? null : index)
@@ -98,6 +136,7 @@ export default function App() {
         selectedBody={selectedBody}
         onBodyClick={handleBodyClick}
         heroProgressRef={heroProgressRef}
+        paused={scenePaused}
       />
 
       {/* ─── OVERLAYS ─── */}
