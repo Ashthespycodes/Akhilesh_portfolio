@@ -1,8 +1,36 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, JSX } from 'react'
 import { gsap } from 'gsap'
 import { useIsMobile } from '../hooks/useIsMobile'
 
 const NAV_ITEMS = ['About Me', 'Experience', 'Projects', 'Blog', 'Information']
+
+const NAV_ICONS: Record<string, JSX.Element> = {
+  'About Me': (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+    </svg>
+  ),
+  'Experience': (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/>
+    </svg>
+  ),
+  'Projects': (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+    </svg>
+  ),
+  'Blog': (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+    </svg>
+  ),
+  'Information': (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+  ),
+}
 
 const TYPEWRITER_LINES = [
   'Star System: Mystic Oasis',
@@ -307,7 +335,7 @@ export function HUDOverlay({ onNavClick, activeNav }: HUDOverlayProps) {
           display: 'flex',
           justifyContent: 'center',
           flexWrap: 'wrap',
-          gap: isMobile ? '0.5rem' : 'clamp(1.5rem, 4vw, 4rem)',
+          gap: isMobile ? '0.3rem' : 'clamp(0.8rem, 2vw, 2rem)',
           zIndex: 200,
           pointerEvents: 'auto',
           borderRadius: '100px',
@@ -333,29 +361,29 @@ export function HUDOverlay({ onNavClick, activeNav }: HUDOverlayProps) {
             key={item}
             className="nav-item cursor-target"
             onClick={() => onNavClick(item)}
+            title={item}
             style={{
               position: 'relative',
               background: 'none',
               border: 'none',
-              color: activeNav === item ? '#00F5D4' : 'rgba(200,230,255,0.85)',
-              fontFamily: 'Orbitron, sans-serif',
-              fontSize: isMobile ? '0.5rem' : 'clamp(0.55rem, 1.1vw, 0.75rem)',
-              letterSpacing: isMobile ? '0.1em' : '0.3em',
-              textTransform: 'uppercase',
+              color: activeNav === item ? '#00F5D4' : 'rgba(200,230,255,0.65)',
               cursor: 'pointer',
-              padding: '0.5rem 0',
+              padding: '0.5rem 0.4rem',
               transition: 'color 0.3s',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
             onMouseEnter={e => {
               gsap.to(e.currentTarget, { color: '#00F5D4', duration: 0.2 })
             }}
             onMouseLeave={e => {
               if (activeNav !== item) {
-                gsap.to(e.currentTarget, { color: 'rgba(200,230,255,0.85)', duration: 0.2 })
+                gsap.to(e.currentTarget, { color: 'rgba(200,230,255,0.65)', duration: 0.2 })
               }
             }}
           >
-            {item}
+            {NAV_ICONS[item]}
           </button>
         ))}
       </div>
