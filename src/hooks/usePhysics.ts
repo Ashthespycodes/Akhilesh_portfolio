@@ -57,6 +57,12 @@ function createBodies(): Body[] {
   return bodies
 }
 
+// Pre-allocated temporaries — reused every frame to avoid GC pressure
+const _tmp    = new THREE.Vector3()
+const _com    = new THREE.Vector3()
+const _comVel = new THREE.Vector3()
+const _trailPt = new THREE.Vector3()
+
 export function usePhysics() {
   const stateRef = useRef<PhysicsState>({
     bodies: createBodies(),
@@ -70,17 +76,16 @@ export function usePhysics() {
     for (const b of bodies) b.acc.set(0, 0, 0)
 
     // Compute pairwise gravitational forces
-    const tmp = new THREE.Vector3()
     for (let i = 0; i < bodies.length; i++) {
       for (let j = i + 1; j < bodies.length; j++) {
         const bi = bodies[i]
         const bj = bodies[j]
-        tmp.subVectors(bj.pos, bi.pos)
-        const distSq = Math.max(tmp.lengthSq(), 0.5) // softening
+        _tmp.subVectors(bj.pos, bi.pos)
+        const distSq = Math.max(_tmp.lengthSq(), 0.5) // softening
         const force = G * bi.mass * bj.mass / distSq
-        tmp.normalize().multiplyScalar(force)
-        bi.acc.addScaledVector(tmp, 1 / bi.mass)
-        bj.acc.addScaledVector(tmp, -1 / bj.mass)
+        _tmp.normalize().multiplyScalar(force)
+        bi.acc.addScaledVector(_tmp, 1 / bi.mass)
+        bj.acc.addScaledVector(_tmp, -1 / bj.mass)
       }
     }
 
@@ -100,23 +105,22 @@ export function usePhysics() {
       planet.vel.addScaledVector(planet.pos, -pullStrength / planetDist)
     }
 
-    // Re-centre: subtract the centre-of-mass position AND velocity every frame
-    // so numerical drift can never accumulate and the system stays at the origin.
+    // Re-centre using pre-allocated vectors
     const totalMass = bodies.reduce((s, b) => s + b.mass, 0)
-    const com    = new THREE.Vector3()
-    const comVel = new THREE.Vector3()
+    _com.set(0, 0, 0)
+    _comVel.set(0, 0, 0)
     for (const b of bodies) {
-      com.addScaledVector(b.pos, b.mass / totalMass)
-      comVel.addScaledVector(b.vel, b.mass / totalMass)
+      _com.addScaledVector(b.pos, b.mass / totalMass)
+      _comVel.addScaledVector(b.vel, b.mass / totalMass)
     }
     for (const b of bodies) {
-      b.pos.sub(com)
-      b.vel.sub(comVel)
+      b.pos.sub(_com)
+      b.vel.sub(_comVel)
     }
 
-    // Update trails
+    // Update trails — reuse _trailPt to avoid per-frame allocation
     for (let i = 0; i < bodies.length; i++) {
-      trails[i].push(bodies[i].pos.clone())
+      trails[i].push(_trailPt.copy(bodies[i].pos).clone())
       if (trails[i].length > TRAIL_LENGTH) trails[i].shift()
     }
   }

@@ -119,12 +119,14 @@ function PhysicsScene({ selectedBody, onBodyClick, heroProgressRef }: PhysicsSce
       <HomePlanet   position={renderPos.current[2]} onClick={() => onBodyClick(2)} />
       <EffectComposer>
         <Bloom intensity={1.8} luminanceThreshold={0.15} luminanceSmoothing={0.9} mipmapBlur />
-        <ChromaticAberration
-          blendFunction={BlendFunction.NORMAL}
-          offset={new THREE.Vector2(0.0008, 0.0008)}
-          radialModulation={true}
-          modulationOffset={0.5}
-        />
+        {!isMobile && (
+          <ChromaticAberration
+            blendFunction={BlendFunction.NORMAL}
+            offset={CHROMATIC_OFFSET}
+            radialModulation={true}
+            modulationOffset={0.5}
+          />
+        )}
         <Vignette offset={0.3} darkness={0.9} />
       </EffectComposer>
     </>
@@ -138,7 +140,10 @@ interface SpaceSceneProps {
   paused?: boolean
 }
 
-// Determine if user is likely on a smaller/mobile device to dial back expensive post-processing
+// Pre-allocated — avoids recreating on every render
+const CHROMATIC_OFFSET = new THREE.Vector2(0.0008, 0.0008)
+
+// Detect mobile once at module load
 const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
 
 export function SpaceScene({ selectedBody, onBodyClick, heroProgressRef, paused = false }: SpaceSceneProps) {
@@ -147,7 +152,7 @@ export function SpaceScene({ selectedBody, onBodyClick, heroProgressRef, paused 
       camera={{ position: [0, 0, 14], fov: 60, near: 0.1, far: 1000 }}
       style={{ position: 'fixed', inset: 0, zIndex: 1, pointerEvents: paused ? 'none' : 'auto' }}
       frameloop={paused ? 'never' : 'always'}
-      dpr={[1, 1.5]}
+      dpr={isMobile ? 1 : [1, 1.5]}
       gl={{
         antialias: false,
         alpha: true,

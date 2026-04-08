@@ -8,7 +8,6 @@ gsap.registerPlugin(ScrollTrigger)
 
 // Heavy components lazily loaded to reduce initial bundle size
 const HUDOverlay = React.lazy(() => import('./components/HUDOverlay').then(m => ({ default: m.HUDOverlay })))
-const ProjectShip = React.lazy(() => import('./components/ProjectShip'))
 const ScrollSections = React.lazy(() => import('./components/ScrollSections'))
 const Particles = React.lazy(() => import('./components/Particles'))
 
@@ -41,7 +40,6 @@ export default function App() {
     if (typeof window !== 'undefined') {
       const prefetch = () => {
         setTimeout(() => {
-          import('./components/ProjectShip').catch(() => {})
           import('./components/ScrollSections').catch(() => {})
           import('./components/Particles').catch(() => {})
         }, 1500)
@@ -118,7 +116,7 @@ export default function App() {
       <div style={{ position: 'fixed', inset: 0, zIndex: 0, background: '#020408' }}>
         <Suspense fallback={null}>
           <Particles
-            particleCount={200}
+            particleCount={typeof window !== 'undefined' && window.innerWidth < 768 ? 80 : 200}
             particleSpread={10}
             speed={0.1}
             particleColors={['#ffffff', '#f5f5f5', '#eeeeee']}

@@ -65,13 +65,6 @@ function TrailMesh({ bodyIndex, stateRef }: TrailMeshProps) {
       colors[i * 3 + 2] = col.b * alpha
     }
 
-    // Zero out unused trail positions
-    for (let i = len; i < TRAIL_LENGTH; i++) {
-      positions[i * 3] = positions[(len - 1) * 3]
-      positions[i * 3 + 1] = positions[(len - 1) * 3 + 1]
-      positions[i * 3 + 2] = positions[(len - 1) * 3 + 2]
-    }
-
     geo.attributes.position.needsUpdate = true
     geo.attributes.color.needsUpdate = true
     geo.setDrawRange(0, len)
