@@ -13,10 +13,12 @@ export default defineConfig({
     },
     rollupOptions: {
       output: {
-        manualChunks: {
-          'vendor-react': ['react', 'react-dom'],
-          'vendor-three': ['three', '@react-three/fiber', '@react-three/drei'],
-          'vendor-gsap': ['gsap'],
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('gsap')) return 'vendor-gsap'
+            // Keep react + three + r3f in the same chunk to avoid circular deps
+            return 'vendor'
+          }
         },
       },
     },
